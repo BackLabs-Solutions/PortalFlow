@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PortalFlow - Portail Client Professionnel</title>
+  <style>
+    :root {
+      --surface-0: #f5f5f3;
+      --surface-1: #ffffff;
+      --surface-2: #ffffff;
+      --text-primary: #2c2c2a;
+      --text-secondary: #888780;
+      --text-muted: #b4b2a9;
+      --border: rgba(92, 94, 90, 0.1);
+      --border-strong: rgba(92, 94, 90, 0.2);
+      --border-accent: #185FA5;
+      --bg-accent: #e6f1fb;
+      --text-accent: #185FA5;
+      --fill-brand: #2c2c2a;
+      --fill-brand-hover: #1a1a18;
+      --on-brand: #ffffff;
+      --fill-success: #639922;
+      --radius: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface-0: #1a1a18;
+        --surface-1: #2a2a27;
+        --surface-2: #3a3a37;
+        --text-primary: #f5f5f3;
+        --text-secondary: #888780;
+        --text-muted: #5f5e5a;
+        --border: rgba(255, 255, 255, 0.1);
+        --border-strong: rgba(255, 255, 255, 0.15);
+        --fill-brand: #f5f5f3;
+        --fill-brand-hover: #e5e5e3;
+        --on-brand: #1a1a18;
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      color: var(--text-primary);
+      background: var(--surface-0);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      padding: 24px 0;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 60px 0 80px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 44px;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .hero .subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.6;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero .description {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      line-height: 1.7;
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Buttons */
+    .cta-primary {
+      background: var(--fill-brand);
+      color: var(--on-brand);
+      border: none;
+      padding: 13px 32px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .cta-primary:hover {
+      background: var(--fill-brand-hover);
+      transform: translateY(-1px);
+    }
+
+    .cta-secondary {
+      background: transparent;
+      border: 0.5px solid var(--border-strong);
+      color: var(--text-primary);
+      padding: 13px 32px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .cta-secondary:hover {
+      border-color: var(--text-primary);
+    }
+
+    /* Problems Section */
+    .problems {
+      padding: 80px 0;
+    }
+
+    .problems h2 {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .problems .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+      font-size: 16px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .problem-card {
+      padding: 28px;
+      background: var(--surface-1);
+      border-radius: 12px;
+      border: 0.5px solid var(--border);
+    }
+
+    .problem-card h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .problem-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 80px 0;
+    }
+
+    .features h2 {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .features .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+      font-size: 16px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .feature {
+      padding: 28px;
+    }
+
+    .feature h3 {
+      font-size: 15px;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .feature p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* Pricing Section */
+    .pricing {
+      padding: 80px 0;
+    }
+
+    .pricing h2 {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .pricing .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+      font-size: 16px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .price-card {
+      background: var(--surface-1);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .price-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .price-card.featured {
+      border: 2px solid var(--border-accent);
+      position: relative;
+    }
+
+    .price-card.featured::before {
+      content: "Recommandé";
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-accent);
+      color: var(--text-accent);
+      padding: 4px 12px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .price-card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .price-card .amount {
+      font-size: 36px;
+      font-weight: 500;
+      margin: 20px 0 8px;
+    }
+
+    .price-card .amount span {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .price-card .period {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .price-card ul {
+      text-align: left;
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin: 24px 0;
+      list-style: none;
+    }
+
+    .price-card li {
+      padding: 10px 0;
+    }
+
+    .price-card li::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      background: var(--fill-success);
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 80px 0;
+    }
+
+    .cta-section h2 {
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .cta-section .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-group input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      background: var(--surface-1);
+      color: var(--text-primary);
+    }
+
+    .form-group input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--border-accent);
+      box-shadow: 0 0 0 3px var(--bg-accent);
+    }
+
+    .form-disclaimer {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 48px 0;
+      border-top: 0.5px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer a:hover {
+      color: var(--text-primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero .description {
+        font-size: 15px;
+      }
+
+      .problem-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group {
+        flex-direction: column;
+      }
+
+      .problems h2,
+      .features h2,
+      .pricing h2,
+      .cta-section h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="container">
+      <div class="logo">PortalFlow</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="container">
+      <h1>Portail client professionnel, sans la complexité</h1>
+      <p class="subtitle">Centralisez vos communications avec les clients et professionnalisez votre image.</p>
+      <p class="description">Remplacez l'éparpillement email, Drive et Slack par un seul portail branded. Vos clients voient votre marque. Vous gagnez des heures chaque semaine.</p>
+      <button class="cta-primary" onclick="document.querySelector('.cta-section').scrollIntoView({ behavior: 'smooth' });">Accéder à la liste d'attente</button>
+    </div>
+  </div>
+
+  <div class="problems">
+    <div class="container">
+      <h2>Les défis des freelancers d'aujourd'hui</h2>
+      <p class="subtitle">Vous les connaissez bien.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>Approbations fragmentées</h3>
+          <p>Les retours des clients sont dispersés entre email, Slack, WhatsApp et commentaires Drive. Impossible de suivre l'état réel du projet.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Chasse aux documents</h3>
+          <p>Vous relancez constamment les clients pour des documents manquants, des signatures ou des approbations. Cela représente 5 à 10 heures par semaine.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Image peu professionnelle</h3>
+          <p>Partager un lien Google Drive n'inspire pas confiance. Cela donne l'impression que vous bricolez plutôt que d'être un vrai professionnel.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Révisions sans fin</h3>
+          <p>Sans checklist claire, les clients demandent continuellement des changements. Vous perdez de l'argent en heures mal facturées.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="container">
+      <h2>Comment PortalFlow résout cela</h2>
+      <p class="subtitle">Simple, efficace, et designed pour vous.</p>
+      <div class="feature-grid">
+        <div class="feature">
+          <h3>Approbations en un clic</h3>
+          <p>Créez une checklist de livrables. Vos clients approuvent directement dans le portail. Fini les "tu as reçu mon dernier email?"</p>
+        </div>
+        <div class="feature">
+          <h3>Votre identité, partout</h3>
+          <p>Logo, couleurs, domaine personnalisé. Vos clients voient votre marque à chaque interaction, renforçant votre professionnalisme.</p>
+        </div>
+        <div class="feature">
+          <h3>Tout centralisé</h3>
+          <p>Documents, livrables, commentaires, statuts des projets. Un seul endroit où regarder. Zéro fragmentation.</p>
+        </div>
+        <div class="feature">
+          <h3>Notifications intelligentes</h3>
+          <p>Vous et vos clients êtes alertés en temps réel. Plus de "je ne savais pas que tu avais répondu".</p>
+        </div>
+        <div class="feature">
+          <h3>Pas de friction client</h3>
+          <p>Un lien suffit. Pas de compte à créer, pas de mot de passe à retenir. Vos clients arrivent directement où ils doivent être.</p>
+        </div>
+        <div class="feature">
+          <h3>Opportunité de revente (pour les agences)</h3>
+          <p>White-label complet. Proposez PortalFlow à vos clients SMB sous votre propre marque. Revenu récurrent garanti.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pricing">
+    <div class="container">
+      <h2>Tarification transparente</h2>
+      <p class="subtitle">Pas de frais cachés. Payez pour ce que vous utilisez.</p>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Starter</h3>
+          <div class="amount">19€<span>/mois</span></div>
+          <p class="period">Parfait pour débuter</p>
+          <ul>
+            <li>1 projet actif</li>
+            <li>5 GB de stockage</li>
+            <li>Branding personnalisé</li>
+            <li>Support par email</li>
+            <li>Jusqu'à 3 clients</li>
+          </ul>
+        </div>
+        <div class="price-card featured">
+          <h3>Professionnel</h3>
+          <div class="amount">49€<span>/mois</span></div>
+          <p class="period">La plupart des freelancers</p>
+          <ul>
+            <li>Projets illimités</li>
+            <li>50 GB de stockage</li>
+            <li>Branding personnalisé</li>
+            <li>Domaine personnalisé inclus</li>
+            <li>Support prioritaire</li>
+            <li>Clients illimités</li>
+          </ul>
+        </div>
+        <div class="price-card">
+          <h3>Agence</h3>
+          <div class="amount">149€<span>/mois</span></div>
+          <p class="period">Pour revendre</p>
+          <ul>
+            <li>White-label complet</li>
+            <li>Domaine personnalisé</li>
+            <li>Clients illimités</li>
+            <li>Accès API (v2)</li>
+            <li>Support dédié</li>
+            <li>Branding sans limite</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <div class="container">
+      <h2>Rejoignez les utilisateurs early access</h2>
+      <p class="subtitle">Soyez parmi les premiers. Accès -50% sur l'abonnement annuel.</p>
+      <div class="form-group">
+        <input type="email" id="email-input" placeholder="votre@email.com" />
+        <button class="cta-primary" onclick="handleSignup();">M'inscrire</button>
+      </div>
+      <p class="form-disclaimer">Pas de spam. Nous vous enverrons un lien d'accès uniquement quand le produit sera prêt.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="container">
+      <p>PortalFlow © 2026 · En validation · <a href="mailto:contact@portalflow.fr">Nous contacter</a></p>
+    </div>
+  </div>
+
+  <script>
+    function handleSignup() {
+      const email = document.getElementById('email-input').value;
+      if (!email || !email.includes('@')) {
+        alert('Veuillez entrer une adresse email valide');
+        return;
+      }
+
+      alert('Merci ! Vous recevrez un accès dès que le produit sera prêt.');
+      document.getElementById('email-input').value = '';
+    }
+  </script>
+</body>
+</html>
