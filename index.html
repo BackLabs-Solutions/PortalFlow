@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PortalFlow - Portail Client Professionnel</title>
+  <meta name="description" content="Centralisez vos communications clients dans un portail branded. Approbations en un clic, documents centralisés, notifications intelligentes.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PortalFlow — Portail client pro, sans la complexité">
+  <meta property="og:description" content="Remplacez l'éparpillement email, Drive et Slack par un seul portail à votre marque. Vos clients voient votre brand. Vous gagnez des heures chaque semaine.">
+  <meta property="og:url" content="https://portalflow-landing-six.vercel.app">
+  <meta property="og:image" content="https://portalflow-landing-six.vercel.app/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PortalFlow — Portail client pro, sans la complexité">
+  <meta name="twitter:description" content="Remplacez l'éparpillement email, Drive et Slack par un seul portail à votre marque.">
+  <meta name="twitter:image" content="https://portalflow-landing-six.vercel.app/og-image.png">
   <style>
     :root {
       --surface-0: #f5f5f3;
@@ -564,11 +574,11 @@
     <div class="container">
       <h2>Rejoignez les utilisateurs early access</h2>
       <p class="subtitle">Soyez parmi les premiers. Accès -50% sur l'abonnement annuel.</p>
-      <div class="form-group">
-        <input type="email" id="email-input" placeholder="votre@email.com" />
-        <button class="cta-primary" onclick="handleSignup();">M'inscrire</button>
-      </div>
-      <p class="form-disclaimer">Pas de spam. Nous vous enverrons un lien d'accès uniquement quand le produit sera prêt.</p>
+      <form id="signup-form" class="form-group">
+        <input type="email" id="email-input" name="email" placeholder="votre@email.com" required />
+        <button type="submit" class="cta-primary" id="submit-btn">M'inscrire</button>
+      </form>
+      <p id="form-feedback" class="form-disclaimer">Pas de spam. Nous vous enverrons un lien d'accès uniquement quand le produit sera prêt.</p>
     </div>
   </div>
 
@@ -579,16 +589,37 @@
   </div>
 
   <script>
-    function handleSignup() {
-      const email = document.getElementById('email-input').value;
-      if (!email || !email.includes('@')) {
-        alert('Veuillez entrer une adresse email valide');
-        return;
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const feedback = document.getElementById('form-feedback');
+      const emailInput = document.getElementById('email-input');
+
+      btn.disabled = true;
+      btn.textContent = 'Envoi...';
+
+      try {
+        const res = await fetch('https://formspree.io/f/mgogvbdg', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput.value })
+        });
+
+        if (res.ok) {
+          feedback.textContent = 'Merci ! Vous recevrez un accès dès que le produit sera prêt.';
+          feedback.style.color = 'var(--fill-success)';
+          emailInput.value = '';
+        } else {
+          throw new Error();
+        }
+      } catch {
+        feedback.textContent = 'Une erreur est survenue. Réessayez ou contactez-nous directement.';
+        feedback.style.color = '#c0392b';
       }
 
-      alert('Merci ! Vous recevrez un accès dès que le produit sera prêt.');
-      document.getElementById('email-input').value = '';
-    }
+      btn.disabled = false;
+      btn.textContent = "M'inscrire";
+    });
   </script>
 </body>
 </html>
