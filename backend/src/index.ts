@@ -31,6 +31,10 @@ app.use(rateLimit({
   message: { error: 'Too many requests, please try again later' },
 }));
 
+app.get('/', (_req, res) => {
+  res.json({ name: 'PortalFlow API', version: '1.0.0', docs: '/health' });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
