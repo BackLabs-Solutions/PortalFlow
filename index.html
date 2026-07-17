@@ -14,45 +14,41 @@
   <meta name="twitter:title" content="PortalFlow — Portail client pro, sans la complexité">
   <meta name="twitter:description" content="Remplacez l'éparpillement email, Drive et Slack par un seul portail à votre marque.">
   <meta name="twitter:image" content="https://portalflow-landing-six.vercel.app/og-image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --surface-0: #f5f5f3;
-      --surface-1: #ffffff;
-      --surface-2: #ffffff;
-      --text-primary: #2c2c2a;
-      --text-secondary: #888780;
-      --text-muted: #b4b2a9;
-      --border: rgba(92, 94, 90, 0.1);
-      --border-strong: rgba(92, 94, 90, 0.2);
-      --border-accent: #185FA5;
-      --bg-accent: #e6f1fb;
-      --text-accent: #185FA5;
-      --fill-brand: #2c2c2a;
-      --fill-brand-hover: #1a1a18;
-      --on-brand: #ffffff;
-      --fill-success: #639922;
-      --radius: 8px;
+      --ink: #0f1729;
+      --slate: #5b6478;
+      --mist: #f7f8fb;
+      --surface: #ffffff;
+      --line: #e6e9f0;
+      --indigo: #3b4cca;
+      --indigo-hover: #32409e;
+      --cyan: #22c0de;
+      --cyan-text: #0f7f96;
+      --cyan-bg: rgba(34, 192, 222, 0.12);
+      --danger: #c0392b;
+      --radius-card: 18px;
+      --radius-control: 10px;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'IBM Plex Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --surface-0: #1a1a18;
-        --surface-1: #2a2a27;
-        --surface-2: #3a3a37;
-        --text-primary: #f5f5f3;
-        --text-secondary: #888780;
-        --text-muted: #5f5e5a;
-        --border: rgba(255, 255, 255, 0.1);
-        --border-strong: rgba(255, 255, 255, 0.15);
-        --fill-brand: #f5f5f3;
-        --fill-brand-hover: #e5e5e3;
-        --on-brand: #1a1a18;
+        --ink: #eef0f7;
+        --slate: #9aa2b8;
+        --mist: #0b1120;
+        --surface: #131b2e;
+        --line: #232d45;
+        --cyan-bg: rgba(34, 192, 222, 0.14);
       }
     }
 
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
     }
 
@@ -61,48 +57,87 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-      color: var(--text-primary);
-      background: var(--surface-0);
+      margin: 0;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--mist);
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
     }
 
     .container {
-      max-width: 800px;
+      max-width: 840px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 24px;
     }
 
     /* Navbar */
     .navbar {
-      padding: 24px 0;
-      border-bottom: 0.5px solid var(--border);
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
       margin-bottom: 40px;
     }
 
-    .logo {
-      font-size: 16px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    /* Hero Section */
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark span {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    .logo-mark span b {
+      color: var(--indigo);
+      font-weight: 600;
+    }
+
+    .nav-login {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--slate);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-login:hover {
+      color: var(--indigo);
+    }
+
+    /* Hero */
     .hero {
-      padding: 60px 0 80px;
+      padding: 48px 0 88px;
       text-align: center;
     }
 
     .hero h1 {
-      font-size: 44px;
+      font-size: 46px;
       line-height: 1.2;
-      margin-bottom: 20px;
-      font-weight: 500;
+      margin: 0 0 20px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      text-wrap: balance;
     }
 
     .hero .subtitle {
       font-size: 18px;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
+      color: var(--slate);
+      margin: 0 0 14px;
       line-height: 1.6;
       max-width: 600px;
       margin-left: auto;
@@ -111,8 +146,8 @@
 
     .hero .description {
       font-size: 16px;
-      color: var(--text-secondary);
-      margin-bottom: 40px;
+      color: var(--slate);
+      margin: 0 0 40px;
       line-height: 1.7;
       max-width: 620px;
       margin-left: auto;
@@ -121,163 +156,143 @@
 
     /* Buttons */
     .cta-primary {
-      background: var(--fill-brand);
-      color: var(--on-brand);
+      background: var(--indigo);
+      color: #ffffff;
       border: none;
       padding: 13px 32px;
-      border-radius: var(--radius);
+      border-radius: var(--radius-control);
+      font-family: var(--font-body);
       font-size: 15px;
       cursor: pointer;
       font-weight: 500;
-      transition: all 0.2s;
+      transition: background 0.2s, transform 0.2s;
     }
 
     .cta-primary:hover {
-      background: var(--fill-brand-hover);
+      background: var(--indigo-hover);
       transform: translateY(-1px);
     }
 
-    .cta-secondary {
-      background: transparent;
-      border: 0.5px solid var(--border-strong);
-      color: var(--text-primary);
-      padding: 13px 32px;
-      border-radius: var(--radius);
-      font-size: 15px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
+    .cta-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    .cta-secondary:hover {
-      border-color: var(--text-primary);
-    }
-
-    /* Problems Section */
-    .problems {
-      padding: 80px 0;
-    }
-
-    .problems h2 {
+    /* Section headings */
+    .problems h2,
+    .features h2,
+    .pricing h2,
+    .cta-section h2 {
       font-size: 28px;
       text-align: center;
-      margin-bottom: 16px;
-      font-weight: 500;
+      margin: 0 0 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }
 
-    .problems .subtitle {
+    .problems .eyebrow,
+    .features .eyebrow,
+    .pricing .eyebrow {
+      display: block;
       text-align: center;
-      color: var(--text-secondary);
-      margin-bottom: 48px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--indigo);
+      margin-bottom: 14px;
+    }
+
+    .problems .subtitle,
+    .features .subtitle,
+    .pricing .subtitle {
+      text-align: center;
+      color: var(--slate);
+      margin: 0 0 48px;
       font-size: 16px;
     }
 
+    .problems, .features, .pricing, .cta-section {
+      padding: 76px 0;
+    }
+
+    /* Problems */
     .problem-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 20px;
     }
 
     .problem-card {
       padding: 28px;
-      background: var(--surface-1);
-      border-radius: 12px;
-      border: 0.5px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 2px rgba(15, 23, 41, 0.04), 0 12px 32px rgba(15, 23, 41, 0.05);
     }
 
     .problem-card h3 {
       font-size: 16px;
-      margin-bottom: 12px;
-      font-weight: 500;
+      margin: 0 0 12px;
+      font-weight: 600;
     }
 
     .problem-card p {
       font-size: 14px;
-      color: var(--text-secondary);
+      color: var(--slate);
       line-height: 1.65;
+      margin: 0;
     }
 
-    /* Features Section */
-    .features {
-      padding: 80px 0;
-    }
-
-    .features h2 {
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 16px;
-      font-weight: 500;
-    }
-
-    .features .subtitle {
-      text-align: center;
-      color: var(--text-secondary);
-      margin-bottom: 48px;
-      font-size: 16px;
-    }
-
+    /* Features */
     .feature-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 32px;
     }
 
-    .feature {
-      padding: 28px;
-    }
-
     .feature h3 {
       font-size: 15px;
-      margin-bottom: 12px;
-      font-weight: 500;
+      margin: 0 0 10px;
+      font-weight: 600;
+    }
+
+    .feature h3::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      margin-right: 9px;
     }
 
     .feature p {
       font-size: 14px;
-      color: var(--text-secondary);
+      color: var(--slate);
       line-height: 1.65;
+      margin: 0;
     }
 
-    /* Pricing Section */
-    .pricing {
-      padding: 80px 0;
-    }
-
-    .pricing h2 {
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 16px;
-      font-weight: 500;
-    }
-
-    .pricing .subtitle {
-      text-align: center;
-      color: var(--text-secondary);
-      margin-bottom: 48px;
-      font-size: 16px;
-    }
-
+    /* Pricing */
     .pricing-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 20px;
     }
 
     .price-card {
-      background: var(--surface-1);
-      border: 0.5px solid var(--border);
-      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
       padding: 32px 24px;
       text-align: center;
-      transition: all 0.3s;
-    }
-
-    .price-card:hover {
-      border-color: var(--border-strong);
+      transition: border-color 0.2s;
+      box-shadow: 0 1px 2px rgba(15, 23, 41, 0.04), 0 12px 32px rgba(15, 23, 41, 0.05);
     }
 
     .price-card.featured {
-      border: 2px solid var(--border-accent);
+      border: 2px solid var(--indigo);
       position: relative;
     }
 
@@ -287,48 +302,53 @@
       top: -13px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--bg-accent);
-      color: var(--text-accent);
+      background: var(--cyan-bg);
+      color: var(--cyan-text);
       padding: 4px 12px;
-      border-radius: var(--radius);
-      font-size: 12px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 11px;
       font-weight: 500;
+      letter-spacing: 0.04em;
     }
 
     .price-card h3 {
       font-size: 16px;
-      margin-bottom: 8px;
-      font-weight: 500;
+      margin: 0 0 8px;
+      font-weight: 600;
     }
 
     .price-card .amount {
-      font-size: 36px;
-      font-weight: 500;
+      font-family: var(--font-display);
+      font-size: 34px;
+      font-weight: 600;
       margin: 20px 0 8px;
     }
 
     .price-card .amount span {
-      font-size: 16px;
-      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--slate);
       font-weight: 400;
     }
 
     .price-card .period {
       font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 24px;
+      color: var(--slate);
+      margin: 0 0 24px;
     }
 
     .price-card ul {
       text-align: left;
       font-size: 14px;
-      color: var(--text-secondary);
-      margin: 24px 0;
+      color: var(--slate);
+      margin: 24px 0 0;
+      padding: 0;
       list-style: none;
     }
 
     .price-card li {
-      padding: 10px 0;
+      padding: 9px 0;
     }
 
     .price-card li::before {
@@ -336,35 +356,17 @@
       display: inline-block;
       width: 4px;
       height: 4px;
-      background: var(--fill-success);
+      background: var(--cyan);
       border-radius: 50%;
       margin-right: 10px;
     }
 
-    /* CTA Section */
-    .cta-section {
-      padding: 80px 0;
-    }
-
-    .cta-section h2 {
-      font-size: 32px;
-      text-align: center;
-      margin-bottom: 16px;
-      font-weight: 500;
-    }
-
-    .cta-section .subtitle {
-      text-align: center;
-      color: var(--text-secondary);
-      margin-bottom: 32px;
-      font-size: 16px;
-    }
-
+    /* CTA / signup */
     .form-group {
       display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-      max-width: 500px;
+      gap: 10px;
+      margin: 0 0 16px;
+      max-width: 480px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -372,50 +374,53 @@
     .form-group input {
       flex: 1;
       padding: 12px 16px;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      font-family: var(--font-body);
       font-size: 14px;
-      background: var(--surface-1);
-      color: var(--text-primary);
+      background: var(--surface);
+      color: var(--ink);
     }
 
     .form-group input::placeholder {
-      color: var(--text-muted);
+      color: var(--slate);
+      opacity: 0.7;
     }
 
     .form-group input:focus {
       outline: none;
-      border-color: var(--border-accent);
-      box-shadow: 0 0 0 3px var(--bg-accent);
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 3px rgba(59, 76, 202, 0.14);
     }
 
     .form-disclaimer {
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--slate);
       text-align: center;
+      margin: 0;
     }
 
     /* Footer */
     .footer {
-      padding: 48px 0;
-      border-top: 0.5px solid var(--border);
+      padding: 44px 0;
+      border-top: 1px solid var(--line);
       text-align: center;
       font-size: 13px;
-      color: var(--text-secondary);
+      color: var(--slate);
     }
 
     .footer a {
-      color: var(--text-secondary);
+      color: var(--slate);
       text-decoration: none;
       transition: color 0.2s;
     }
 
     .footer a:hover {
-      color: var(--text-primary);
+      color: var(--ink);
     }
 
     /* Responsive */
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .hero h1 {
         font-size: 32px;
       }
@@ -424,14 +429,8 @@
         font-size: 15px;
       }
 
-      .problem-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .feature-grid {
-        grid-template-columns: 1fr;
-      }
-
+      .problem-grid,
+      .feature-grid,
       .pricing-grid {
         grid-template-columns: 1fr;
       }
@@ -452,7 +451,14 @@
 <body>
   <div class="navbar">
     <div class="container">
-      <div class="logo">PortalFlow</div>
+      <div class="logo-mark">
+        <svg width="26" height="26" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect x="13" y="13" width="74" height="74" rx="23" stroke="#3B4CCA" stroke-width="10"/>
+          <rect x="41" y="41" width="34" height="34" rx="13" fill="#22C0DE"/>
+        </svg>
+        <span>Portal<b>Flow</b></span>
+      </div>
+      <a class="nav-login" href="https://portalflow-dashboard.vercel.app/login">Se connecter</a>
     </div>
   </div>
 
@@ -467,6 +473,7 @@
 
   <div class="problems">
     <div class="container">
+      <span class="eyebrow">LE CONSTAT</span>
       <h2>Les défis des freelancers d'aujourd'hui</h2>
       <p class="subtitle">Vous les connaissez bien.</p>
       <div class="problem-grid">
@@ -492,6 +499,7 @@
 
   <div class="features">
     <div class="container">
+      <span class="eyebrow">LA SOLUTION</span>
       <h2>Comment PortalFlow résout cela</h2>
       <p class="subtitle">Simple, efficace, et designed pour vous.</p>
       <div class="feature-grid">
@@ -525,6 +533,7 @@
 
   <div class="pricing">
     <div class="container">
+      <span class="eyebrow">TARIFS</span>
       <h2>Tarification transparente</h2>
       <p class="subtitle">Pas de frais cachés. Payez pour ce que vous utilisez.</p>
       <div class="pricing-grid">
@@ -607,14 +616,14 @@
 
         if (res.ok) {
           feedback.textContent = 'Merci ! Vous recevrez un accès dès que le produit sera prêt.';
-          feedback.style.color = 'var(--fill-success)';
+          feedback.style.color = 'var(--cyan-text)';
           emailInput.value = '';
         } else {
           throw new Error();
         }
       } catch {
         feedback.textContent = 'Une erreur est survenue. Réessayez ou contactez-nous directement.';
-        feedback.style.color = '#c0392b';
+        feedback.style.color = 'var(--danger)';
       }
 
       btn.disabled = false;
