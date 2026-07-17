@@ -14,6 +14,7 @@ import messageRoutes from './routes/messages';
 import webhookRoutes from './routes/webhooks';
 import zapierRoutes from './routes/zapier';
 import portalRoutes from './routes/portal';
+import openapiSpec from './openapi.json';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -39,11 +40,15 @@ app.use(rateLimit({
 }));
 
 app.get('/', (_req, res) => {
-  res.json({ name: 'PortalFlow API', version: '1.0.0', docs: '/health' });
+  res.json({ name: 'PortalFlow API', version: '1.0.0', health: '/health', openapi: '/openapi.json' });
 });
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/openapi.json', (_req, res) => {
+  res.json(openapiSpec);
 });
 
 app.use('/auth', authRoutes);

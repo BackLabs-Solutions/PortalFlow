@@ -1,0 +1,456 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "PortalFlow API",
+    "version": "1.0.0",
+    "description": "REST API for PortalFlow, a client portal for freelancers. Covers account management, project workflows, and the Zapier integration endpoints.",
+    "contact": { "email": "contact@backlab.fr" }
+  },
+  "servers": [{ "url": "https://portalflow.onrender.com" }],
+  "tags": [
+    { "name": "Auth", "description": "Magic-link authentication and API key management" },
+    { "name": "Users", "description": "Account profile and branding" },
+    { "name": "Projects", "description": "Client project management" },
+    { "name": "Files", "description": "Project file metadata" },
+    { "name": "Checklist", "description": "Deliverable approval checklist items" },
+    { "name": "Messages", "description": "Project comment threads" },
+    { "name": "Webhooks", "description": "Zapier webhook subscription management" },
+    { "name": "Zapier", "description": "Polling triggers and actions used by the Zapier integration" },
+    { "name": "Portal", "description": "Public, unauthenticated client-facing project portal" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT issued by POST /auth/verifyToken, used for the freelancer dashboard."
+      },
+      "apiKeyAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Long-lived API key issued by POST /auth/generate-api-key, used for Zapier and webhook endpoints."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": { "error": { "type": "string" } }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string", "nullable": true },
+          "logoUrl": { "type": "string", "nullable": true },
+          "brandColor": { "type": "string", "nullable": true },
+          "customDomain": { "type": "string", "nullable": true },
+          "tier": { "type": "string", "enum": ["free", "pro", "agency"] }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "clientEmail": { "type": "string", "nullable": true },
+          "clientName": { "type": "string", "nullable": true },
+          "status": { "type": "string", "enum": ["active", "completed", "archived"] },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "File": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "projectId": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "url": { "type": "string", "nullable": true },
+          "size": { "type": "integer", "nullable": true },
+          "uploadedBy": { "type": "string", "enum": ["freelancer", "client"], "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ChecklistItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "projectId": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+          "approvedBy": { "type": "string", "nullable": true },
+          "approvedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "projectId": { "type": "string", "format": "uuid" },
+          "fileId": { "type": "string", "format": "uuid", "nullable": true },
+          "userEmail": { "type": "string", "nullable": true },
+          "content": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Webhook": {
+        "type": "object",
+        "properties": {
+          "webhook_id": { "type": "string", "format": "uuid" },
+          "event_type": { "type": "string", "enum": ["project_created", "item_approved", "message_created"] },
+          "webhook_url": { "type": "string" },
+          "active": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Health check",
+        "responses": { "200": { "description": "Service is healthy" } }
+      }
+    },
+    "/auth/sendMagicLink": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Send a magic-link sign-in email",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["email"], "properties": { "email": { "type": "string", "format": "email" } } } } }
+        },
+        "responses": {
+          "200": { "description": "Email sent", "content": { "application/json": { "schema": { "type": "object", "properties": { "message": { "type": "string" } } } } } },
+          "400": { "description": "Invalid email", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/auth/verifyToken": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Exchange a magic-link token for a session JWT",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["token"], "properties": { "token": { "type": "string" } } } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "user": { "$ref": "#/components/schemas/User" }, "token": { "type": "string" } } } } }
+          },
+          "401": { "description": "Token expired or invalid", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get the current authenticated user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/generate-api-key": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Generate (or rotate) the account's Zapier API key",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object", "properties": { "apiKey": { "type": "string" } } } } } },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } } }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update profile and branding",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "name": { "type": "string" }, "logoUrl": { "type": "string" }, "brandColor": { "type": "string" }, "customDomain": { "type": "string" } } } } }
+        },
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } } }
+      }
+    },
+    "/users/referral": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get referral code and count",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object", "properties": { "referralCode": { "type": "string" }, "referralCount": { "type": "integer" } } } } } } }
+      }
+    },
+    "/projects": {
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Create a project",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "description": { "type": "string" }, "clientEmail": { "type": "string" }, "clientName": { "type": "string" } } } } }
+        },
+        "responses": { "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Project" } } } } }
+      },
+      "get": {
+        "tags": ["Projects"],
+        "summary": "List projects",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20, "maximum": 100 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["active", "completed", "archived"] } }
+        ],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Project" } } } } } }
+      }
+    },
+    "/projects/{id}": {
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Get a project with its files, checklist, and messages",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" } }
+      },
+      "put": {
+        "tags": ["Projects"],
+        "summary": "Update a project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" }, "status": { "type": "string", "enum": ["active", "completed", "archived"] } } } } }
+        },
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Project" } } } } }
+      },
+      "delete": {
+        "tags": ["Projects"],
+        "summary": "Delete a project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/projects/{id}/files": {
+      "post": {
+        "tags": ["Files"],
+        "summary": "Add a file to a project",
+        "description": "Records file metadata (name/size). Binary storage is not yet implemented.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "size": { "type": "integer" }, "uploadedBy": { "type": "string", "enum": ["freelancer", "client"] } } } } }
+        },
+        "responses": { "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/File" } } } } }
+      },
+      "get": {
+        "tags": ["Files"],
+        "summary": "List files for a project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/File" } } } } } }
+      }
+    },
+    "/files/{id}": {
+      "delete": {
+        "tags": ["Files"],
+        "summary": "Delete a file",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/projects/{id}/checklist": {
+      "post": {
+        "tags": ["Checklist"],
+        "summary": "Create a checklist item",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["title"], "properties": { "title": { "type": "string" }, "description": { "type": "string" } } } } }
+        },
+        "responses": { "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChecklistItem" } } } } }
+      },
+      "get": {
+        "tags": ["Checklist"],
+        "summary": "List checklist items for a project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ChecklistItem" } } } } } }
+      }
+    },
+    "/checklist/{id}": {
+      "put": {
+        "tags": ["Checklist"],
+        "summary": "Update a checklist item (e.g. approve or reject)",
+        "description": "Setting status to 'approved' fires the item_approved Zapier trigger.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "title": { "type": "string" }, "description": { "type": "string" }, "status": { "type": "string", "enum": ["pending", "approved", "rejected"] }, "approvedBy": { "type": "string" } } } } }
+        },
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChecklistItem" } } } } }
+      }
+    },
+    "/projects/{id}/messages": {
+      "post": {
+        "tags": ["Messages"],
+        "summary": "Post a message on a project",
+        "description": "Fires the message_created Zapier trigger.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["content"], "properties": { "content": { "type": "string" }, "fileId": { "type": "string", "format": "uuid" }, "userEmail": { "type": "string" } } } } }
+        },
+        "responses": { "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Message" } } } } }
+      },
+      "get": {
+        "tags": ["Messages"],
+        "summary": "List messages for a project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Message" } } } } } }
+      }
+    },
+    "/webhooks/register": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Register a webhook subscription",
+        "security": [{ "apiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["eventType", "webhookUrl"], "properties": { "eventType": { "type": "string", "enum": ["project_created", "item_approved", "message_created"] }, "webhookUrl": { "type": "string" } } } } }
+        },
+        "responses": { "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Webhook" } } } } }
+      }
+    },
+    "/webhooks": {
+      "get": {
+        "tags": ["Webhooks"],
+        "summary": "List registered webhooks",
+        "security": [{ "apiKeyAuth": [] }],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Webhook" } } } } } }
+      }
+    },
+    "/webhooks/{id}": {
+      "delete": {
+        "tags": ["Webhooks"],
+        "summary": "Delete a webhook subscription",
+        "security": [{ "apiKeyAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "Deleted" } }
+      }
+    },
+    "/webhooks/test": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Send a sample payload to a registered webhook, or preview sample data for an event type",
+        "security": [{ "apiKeyAuth": [] }],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "webhookId": { "type": "string", "format": "uuid" }, "eventType": { "type": "string", "enum": ["project_created", "item_approved", "message_created"] } } } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/zapier/me": {
+      "get": {
+        "tags": ["Zapier"],
+        "summary": "Auth-test endpoint used by the Zapier integration",
+        "security": [{ "apiKeyAuth": [] }],
+        "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object", "properties": { "id": { "type": "string" }, "email": { "type": "string" } } } } } } }
+      }
+    },
+    "/api/zapier/projects/recent": {
+      "get": {
+        "tags": ["Zapier"],
+        "summary": "Polling source for the \"New Project Created\" trigger",
+        "security": [{ "apiKeyAuth": [] }],
+        "parameters": [{ "name": "limit", "in": "query", "schema": { "type": "integer", "default": 25, "maximum": 100 } }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/zapier/checklist/approved": {
+      "get": {
+        "tags": ["Zapier"],
+        "summary": "Polling source for the \"Client Approved Item\" trigger",
+        "security": [{ "apiKeyAuth": [] }],
+        "parameters": [{ "name": "limit", "in": "query", "schema": { "type": "integer", "default": 25, "maximum": 100 } }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/zapier/messages/recent": {
+      "get": {
+        "tags": ["Zapier"],
+        "summary": "Polling source for the \"New Message\" trigger",
+        "security": [{ "apiKeyAuth": [] }],
+        "parameters": [{ "name": "limit", "in": "query", "schema": { "type": "integer", "default": 25, "maximum": 100 } }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/zapier/create-project": {
+      "post": {
+        "tags": ["Zapier"],
+        "summary": "\"Create Project\" action",
+        "security": [{ "apiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "description": { "type": "string" }, "clientEmail": { "type": "string" }, "clientName": { "type": "string" } } } } }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/portal/{id}": {
+      "get": {
+        "tags": ["Portal"],
+        "summary": "View a project's public client portal",
+        "description": "No authentication — access is gated by knowledge of the project's unguessable UUID (the share link).",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" } }
+      }
+    },
+    "/portal/{id}/checklist/{itemId}": {
+      "put": {
+        "tags": ["Portal"],
+        "summary": "Client approves or rejects a checklist item",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "itemId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["status", "approvedBy"], "properties": { "status": { "type": "string", "enum": ["approved", "rejected"] }, "approvedBy": { "type": "string" } } } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/portal/{id}/messages": {
+      "post": {
+        "tags": ["Portal"],
+        "summary": "Client posts a message",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["content"], "properties": { "content": { "type": "string" }, "userEmail": { "type": "string" } } } } }
+        },
+        "responses": { "201": { "description": "Created" } }
+      }
+    }
+  }
+}
