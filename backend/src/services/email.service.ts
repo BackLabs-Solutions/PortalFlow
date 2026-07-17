@@ -1,26 +1,18 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function sendMagicLinkEmail(to: string, token: string) {
   const dashboardUrl = process.env.DASHBOARD_URL || 'http://localhost:3000';
   const link = `${dashboardUrl}/verify?token=${token}`;
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (!resend) {
     console.log(`[DEV] Magic link for ${to}: ${link}`);
     return;
   }
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM || 'noreply@portalflow.com',
+  const { error } = await resend.emails.send({
+    from: process.env.EMAIL_FROM || 'PortalFlow <noreply@mail.backlab.fr>',
     to,
     subject: 'Votre lien de connexion PortalFlow',
     html: `
@@ -34,4 +26,9 @@ export async function sendMagicLinkEmail(to: string, token: string) {
       </div>
     `,
   });
+
+  if (error) {
+    console.error('Resend error:', error);
+    throw new Error('Failed to send magic link email');
+  }
 }
