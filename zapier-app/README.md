@@ -6,7 +6,7 @@ Code source de l'intégration Zapier officielle pour [PortalFlow](https://portal
 
 ```
 zapier-app/
-├── .zapierapprc          # ID + clé de l'app (généré par `zapier register`)
+├── .zapierapprc          # ID + clé de l'app (généré par `zapier-platform register`)
 ├── package.json
 ├── index.js               # Point d'entrée : assemble auth/triggers/creates
 ├── authentication.js       # Auth par clé API
@@ -28,9 +28,13 @@ Prérequis : Node.js 18+, un compte [Zapier Developer](https://developer.zapier.
 cd zapier-app
 npm install -g zapier-platform-cli
 npm install
+```
 
+> Note : depuis la CLI v17+, le binaire installé s'appelle **`zapier-platform`**, pas `zapier`. Toutes les commandes ci-dessous utilisent ce nom.
+
+```bash
 # Connexion au compte Zapier Developer (ouvre un navigateur)
-zapier login
+zapier-platform login
 ```
 
 ## Variables d'environnement
@@ -45,42 +49,41 @@ export BASE_URL=http://localhost:3001
 
 ```bash
 # Valide la structure de l'app (schéma Zapier)
-zapier validate
-
-# Lance les tests (voir test/ — à écrire au besoin avec `zapier scaffold test`)
-npm test
+zapier-platform validate
 ```
+
+`validate` fonctionne déjà sans connexion — il vérifie la structure du code. Les commandes suivantes nécessitent d'être connectée (`zapier-platform login`) et l'app enregistrée (`zapier-platform register`, voir plus bas).
 
 Pour un test manuel d'un trigger ou d'une action sans passer par l'UI Zapier :
 
 ```bash
-zapier invoke trigger project_created
-zapier invoke create create_project
+zapier-platform invoke trigger project_created
+zapier-platform invoke create create_project
 ```
 
-(nécessite d'avoir configuré une clé API de test via `zapier env:set`)
+(nécessite d'avoir configuré une clé API de test via `zapier-platform env:set`)
 
 ## Enregistrer et pousser l'app
 
 **Première fois seulement** — crée l'app côté Zapier et remplace `.zapierapprc` :
 
 ```bash
-zapier register "PortalFlow"
+zapier-platform register "PortalFlow"
 ```
 
 **À chaque changement** — pousse une nouvelle version vers Zapier :
 
 ```bash
-zapier push
+zapier-platform push
 ```
 
 ## Soumettre pour review
 
 1. Aller sur [developer.zapier.com](https://developer.zapier.com), ouvrir l'app PortalFlow
 2. Compléter la fiche : description, catégorie, logo, liens de support
-3. Vérifier que chaque trigger/action a des exemples fonctionnels (`zapier push` doit être à jour)
+3. Vérifier que chaque trigger/action a des exemples fonctionnels (`zapier-platform push` doit être à jour)
 4. Cliquer **Submit for Review**
-5. Délai habituel : 5 à 10 jours ouvrés. Zapier peut renvoyer des demandes de correction — traiter, `zapier push`, resoumettre.
+5. Délai habituel : 5 à 10 jours ouvrés. Zapier peut renvoyer des demandes de correction — traiter, `zapier-platform push`, resoumettre.
 
 ## Notes
 

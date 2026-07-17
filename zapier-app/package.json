@@ -12,13 +12,13 @@
     "npm": ">=9.0.0"
   },
   "dependencies": {
-    "zapier-platform-core": "16.5.0"
+    "zapier-platform-core": "19.0.0"
   },
   "devDependencies": {
     "mocha": "^10.7.3",
-    "zapier-platform-cli": "16.5.0"
+    "zapier-platform-cli": "^19.0.0"
   },
   "zapier": {
-    "convertedByCLIVersion": "16.5.0"
+    "convertedByCLIVersion": "19.0.0"
   }
 }
