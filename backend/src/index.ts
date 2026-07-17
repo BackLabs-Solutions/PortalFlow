@@ -12,6 +12,7 @@ import fileRoutes from './routes/files';
 import checklistRoutes from './routes/checklist';
 import messageRoutes from './routes/messages';
 import webhookRoutes from './routes/webhooks';
+import zapierRoutes from './routes/zapier';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -46,7 +47,7 @@ app.use('/', fileRoutes);
 app.use('/', checklistRoutes);
 app.use('/', messageRoutes);
 app.use('/webhooks', webhookRoutes);
-app.use('/api/zapier', webhookRoutes);
+app.use('/api/zapier', zapierRoutes);
 
 app.use(errorHandler);
 

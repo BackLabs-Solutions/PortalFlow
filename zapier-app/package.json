@@ -1,0 +1,24 @@
+{
+  "name": "portalflow-zapier",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zapier integration for PortalFlow — client portal for freelancers",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive test --timeout 20000"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "zapier-platform-core": "16.5.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.7.3",
+    "zapier-platform-cli": "16.5.0"
+  },
+  "zapier": {
+    "convertedByCLIVersion": "16.5.0"
+  }
+}

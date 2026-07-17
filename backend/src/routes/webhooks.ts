@@ -127,33 +127,4 @@ router.post('/test', requireApiKey, async (req: Request, res: Response, next: Ne
   }
 });
 
-router.post('/create-project', requireApiKey, async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { name, description, clientEmail, clientName } = req.body;
-    if (!name) throw new AppError(400, 'Project name is required');
-
-    const project = await prisma.project.create({
-      data: {
-        userId: req.user!.id,
-        name,
-        description,
-        clientEmail,
-        clientName,
-      },
-    });
-
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-
-    res.status(201).json({
-      id: project.id,
-      name: project.name,
-      client_email: project.clientEmail,
-      client_name: project.clientName,
-      project_url: `${backendUrl}/projects/${project.id}`,
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
 export default router;
