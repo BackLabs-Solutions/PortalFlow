@@ -1,0 +1,129 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["portalflow"]
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  logoUrl       String?   @map("logo_url")
+  brandColor    String?   @map("brand_color")
+  customDomain  String?   @map("custom_domain")
+  tier          String    @default("free")
+  referralCode  String?   @unique @map("referral_code")
+  referralCount Int       @default(0) @map("referral_count")
+  apiKey        String?   @unique @map("api_key")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  projects Project[]
+  webhooks Webhook[]
+
+  @@map("users")
+  @@schema("portalflow")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  name        String
+  description String?
+  clientEmail String?  @map("client_email")
+  clientName  String?  @map("client_name")
+  status      String   @default("active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files          File[]
+  checklistItems ChecklistItem[]
+  messages       Message[]
+  payments       Payment[]
+
+  @@map("projects")
+  @@schema("portalflow")
+}
+
+model File {
+  id         String   @id @default(uuid())
+  projectId  String   @map("project_id")
+  name       String
+  url        String?
+  size       Int?
+  uploadedBy String?  @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@map("files")
+  @@schema("portalflow")
+}
+
+model ChecklistItem {
+  id          String    @id @default(uuid())
+  projectId   String    @map("project_id")
+  title       String
+  description String?
+  status      String    @default("pending")
+  approvedBy  String?   @map("approved_by")
+  approvedAt  DateTime? @map("approved_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_items")
+  @@schema("portalflow")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  fileId    String?  @map("file_id")
+  userEmail String?  @map("user_email")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  file    File?   @relation(fields: [fileId], references: [id], onDelete: SetNull)
+
+  @@map("messages")
+  @@schema("portalflow")
+}
+
+model Payment {
+  id        String    @id @default(uuid())
+  projectId String    @map("project_id")
+  amount    Decimal   @db.Decimal(10, 2)
+  status    String    @default("pending")
+  dueDate   DateTime? @map("due_date")
+  paidAt    DateTime? @map("paid_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+  @@schema("portalflow")
+}
+
+model Webhook {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  eventType  String   @map("event_type")
+  webhookUrl String   @map("webhook_url")
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("webhooks")
+  @@schema("portalflow")
+}
