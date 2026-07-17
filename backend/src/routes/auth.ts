@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
 import { sendMagicLink, verifyMagicLinkToken, generateApiKey } from '../services/auth.service';
 import { requireAuth } from '../middleware/auth';
 import prisma from '../config/database';
@@ -26,6 +27,12 @@ router.post('/verifyToken', async (req: Request, res: Response, next: NextFuncti
     const result = await verifyMagicLinkToken(token);
     res.json(result);
   } catch (err) {
+    if (err instanceof TokenExpiredError) {
+      return next(new AppError(401, 'This link has expired. Request a new one.'));
+    }
+    if (err instanceof JsonWebTokenError) {
+      return next(new AppError(401, 'This link is invalid.'));
+    }
     next(err);
   }
 });
