@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: portalflow-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MAGIC_LINK_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://portalflow-landing-six.vercel.app
+      - key: EMAIL_FROM
+        value: noreply@portalflow.com
