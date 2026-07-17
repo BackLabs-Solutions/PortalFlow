@@ -11,8 +11,8 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendMagicLinkEmail(to: string, token: string) {
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-  const link = `${frontendUrl}/auth/verify?token=${token}`;
+  const dashboardUrl = process.env.DASHBOARD_URL || 'http://localhost:3000';
+  const link = `${dashboardUrl}/verify?token=${token}`;
 
   if (process.env.NODE_ENV !== 'production') {
     console.log(`[DEV] Magic link for ${to}: ${link}`);

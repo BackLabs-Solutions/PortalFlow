@@ -13,12 +13,18 @@ import checklistRoutes from './routes/checklist';
 import messageRoutes from './routes/messages';
 import webhookRoutes from './routes/webhooks';
 import zapierRoutes from './routes/zapier';
+import portalRoutes from './routes/portal';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 
+const allowedOrigins = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
   credentials: true,
 }));
 
@@ -48,6 +54,7 @@ app.use('/', checklistRoutes);
 app.use('/', messageRoutes);
 app.use('/webhooks', webhookRoutes);
 app.use('/api/zapier', zapierRoutes);
+app.use('/portal', portalRoutes);
 
 app.use(errorHandler);
 

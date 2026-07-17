@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --ink: #0f1729;
+  --slate: #5b6478;
+  --mist: #f7f8fb;
+  --surface: #ffffff;
+  --line: #e6e9f0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eef0f7;
+    --slate: #9aa2b8;
+    --mist: #0b1120;
+    --surface: #131b2e;
+    --line: #232d45;
+  }
+}
+
+:root[data-theme='dark'] {
+  --ink: #eef0f7;
+  --slate: #9aa2b8;
+  --mist: #0b1120;
+  --surface: #131b2e;
+  --line: #232d45;
+}
+
+:root[data-theme='light'] {
+  --ink: #0f1729;
+  --slate: #5b6478;
+  --mist: #f7f8fb;
+  --surface: #ffffff;
+  --line: #e6e9f0;
+}
+
+* {
+  border-color: var(--line);
+}
+
+body {
+  background: var(--mist);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
