@@ -72,10 +72,15 @@ export default function ClientPortalPage() {
             <ul className="divide-y divide-line">
               {portal.files.map((file) => (
                 <li key={file.id} className="flex items-center justify-between gap-3 py-2.5">
-                  <div className="flex items-center gap-2.5">
+                  <a
+                    href={file.url ?? undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 hover:underline"
+                  >
                     <File size={15} className="text-slate" />
                     <span className="text-sm text-ink">{file.name}</span>
-                  </div>
+                  </a>
                   <span className="font-mono text-xs text-slate tabular-nums">{formatSize(file.size)}</span>
                 </li>
               ))}

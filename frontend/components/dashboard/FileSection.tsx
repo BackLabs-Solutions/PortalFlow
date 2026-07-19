@@ -24,8 +24,7 @@ export function FileSection({ projectId }: { projectId: string }) {
   });
 
   const upload = useMutation({
-    mutationFn: (file: globalThis.File) =>
-      api.addFile(projectId, { name: file.name, size: file.size, uploadedBy: 'freelancer' }),
+    mutationFn: (file: globalThis.File) => api.addFile(projectId, file, 'freelancer'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files', projectId] });
       toast.success('Fichier ajouté');
@@ -65,7 +64,7 @@ export function FileSection({ projectId }: { projectId: string }) {
         <p className="text-sm text-slate">
           Glissez un fichier ici ou <span className="font-medium text-indigo">parcourir</span>
         </p>
-        <p className="text-xs text-slate/70">Mode démo — seuls les métadonnées sont enregistrées</p>
+        <p className="text-xs text-slate/70">PDF, images, Office, ZIP — 20 Mo max</p>
         <input
           ref={inputRef}
           type="file"
@@ -84,10 +83,15 @@ export function FileSection({ projectId }: { projectId: string }) {
               key={file.id}
               className="flex items-center justify-between gap-3 rounded-control px-2 py-2 hover:bg-mist"
             >
-              <div className="flex min-w-0 items-center gap-2.5">
+              <a
+                href={file.url ?? undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-w-0 items-center gap-2.5 hover:underline"
+              >
                 <File size={15} className="shrink-0 text-slate" />
                 <span className="truncate text-sm text-ink">{file.name}</span>
-              </div>
+              </a>
               <div className="flex shrink-0 items-center gap-3">
                 <span className="font-mono text-xs text-slate tabular-nums">{formatSize(file.size)}</span>
                 <button

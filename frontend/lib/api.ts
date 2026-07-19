@@ -12,11 +12,12 @@ export class ApiError extends Error {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
+  const isFormData = options.body instanceof FormData;
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
@@ -77,8 +78,12 @@ export const api = {
 
   getFiles: (projectId: string) => request<ProjectFile[]>(`/projects/${projectId}/files`),
 
-  addFile: (projectId: string, data: { name: string; size: number; uploadedBy?: string }) =>
-    request<ProjectFile>(`/projects/${projectId}/files`, { method: 'POST', body: JSON.stringify(data) }),
+  addFile: (projectId: string, file: File, uploadedBy = 'freelancer') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('uploadedBy', uploadedBy);
+    return request<ProjectFile>(`/projects/${projectId}/files`, { method: 'POST', body: formData });
+  },
 
   deleteFile: (fileId: string) => request<{ message: string }>(`/files/${fileId}`, { method: 'DELETE' }),
 

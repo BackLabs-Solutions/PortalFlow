@@ -72,12 +72,14 @@ curl -X DELETE http://localhost:3001/projects/PROJECT_ID \
 ```
 
 ### Files
+Files are stored in Supabase Storage (bucket `project-files`, public read). Allowed types: PDF, images, Office docs, ZIP, plain text/CSV. Max 20MB per file.
+
 ```bash
-# Upload (mock)
+# Upload (real multipart upload)
 curl -X POST http://localhost:3001/projects/PROJECT_ID/files \
   -H "Authorization: Bearer JWT_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "document.pdf", "size": 1024000}'
+  -F "file=@/path/to/document.pdf" \
+  -F "uploadedBy=freelancer"
 
 # Lister
 curl http://localhost:3001/projects/PROJECT_ID/files \
