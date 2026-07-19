@@ -1,5 +1,22 @@
 import { getToken, clearToken } from './auth';
-import type { User, Project, ProjectFile, ChecklistItem, Message, PortalData, SubscriptionInfo, LimitsInfo } from './types';
+import type {
+  User,
+  Project,
+  ProjectFile,
+  ChecklistItem,
+  Message,
+  PortalData,
+  SubscriptionInfo,
+  LimitsInfo,
+  Task,
+  TaskStatus,
+  TaskSummary,
+  Payment,
+  Contract,
+  TaskCompletionReport,
+  ClientResponseTimeReport,
+  InvoiceStatusReport,
+} from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://portalflow.onrender.com';
 
@@ -117,6 +134,37 @@ export const api = {
   createMessage: (projectId: string, data: { content: string; userEmail?: string }) =>
     request<Message>(`/projects/${projectId}/messages`, { method: 'POST', body: JSON.stringify(data) }),
 
+  getTasks: (projectId: string) => request<Task[]>(`/projects/${projectId}/tasks`),
+
+  getTaskSummary: (projectId: string) => request<TaskSummary>(`/projects/${projectId}/tasks/summary`),
+
+  createTask: (projectId: string, data: { title: string; description?: string; assignedTo?: string; dueDate?: string }) =>
+    request<Task>(`/projects/${projectId}/tasks`, { method: 'POST', body: JSON.stringify(data) }),
+
+  updateTask: (taskId: string, data: Partial<{ title: string; description: string; assignedTo: string; dueDate: string; status: TaskStatus }>) =>
+    request<Task>(`/tasks/${taskId}`, { method: 'PUT', body: JSON.stringify(data) }),
+
+  getPayments: (projectId: string) => request<Payment[]>(`/projects/${projectId}/payments`),
+
+  createPayment: (projectId: string, data: { description?: string; amount: number; dueDate?: string }) =>
+    request<Payment>(`/projects/${projectId}/payments`, { method: 'POST', body: JSON.stringify(data) }),
+
+  updatePayment: (paymentId: string, data: Partial<{ description: string; amount: number; dueDate: string; status: Payment['status'] }>) =>
+    request<Payment>(`/payments/${paymentId}`, { method: 'PUT', body: JSON.stringify(data) }),
+
+  getTaskCompletionReport: () => request<TaskCompletionReport[]>('/reports/task_completion'),
+
+  getClientResponseTimeReport: () => request<ClientResponseTimeReport[]>('/reports/client_response_time'),
+
+  getInvoiceStatusReport: () => request<InvoiceStatusReport>('/reports/invoice_status'),
+
+  getContracts: (projectId: string) => request<Contract[]>(`/projects/${projectId}/contracts`),
+
+  createContract: (projectId: string, data: { template: 'freelance' | 'nda'; clientEmail: string }) =>
+    request<Contract>(`/projects/${projectId}/contracts`, { method: 'POST', body: JSON.stringify(data) }),
+
+  getContract: (contractId: string) => request<Contract>(`/contracts/${contractId}`),
+
   // Public client-portal endpoints — no auth token attached
   getPortal: (projectId: string) =>
     fetch(`${API_BASE_URL}/portal/${projectId}`).then((r) => {
@@ -132,6 +180,16 @@ export const api = {
     }).then((r) => {
       if (!r.ok) throw new ApiError(r.status, 'Failed to update item');
       return r.json() as Promise<ChecklistItem>;
+    }),
+
+  updatePortalTask: (projectId: string, taskId: string, status: TaskStatus) =>
+    fetch(`${API_BASE_URL}/portal/${projectId}/tasks/${taskId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    }).then((r) => {
+      if (!r.ok) throw new ApiError(r.status, 'Failed to update task');
+      return r.json() as Promise<Task>;
     }),
 
   createPortalMessage: (projectId: string, data: { content: string; userEmail?: string }) =>

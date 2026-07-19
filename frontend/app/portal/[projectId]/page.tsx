@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Logo } from '@/components/ui/Logo';
 import { PortalChecklist } from '@/components/portal/PortalChecklist';
 import { PortalMessages } from '@/components/portal/PortalMessages';
+import { PortalTasks } from '@/components/portal/PortalTasks';
 
 function formatSize(bytes: number | null) {
   if (!bytes) return '—';
@@ -87,6 +88,8 @@ export default function ClientPortalPage() {
             </ul>
           </Card>
         )}
+
+        <PortalTasks projectId={portal.id} tasks={portal.tasks} />
 
         <PortalChecklist
           projectId={portal.id}

@@ -66,8 +66,49 @@ model Project {
   checklistItems ChecklistItem[]
   messages       Message[]
   payments       Payment[]
+  tasks          Task[]
+  contracts      Contract[]
 
   @@map("projects")
+  @@schema("portalflow")
+}
+
+model Task {
+  id                  String    @id @default(uuid())
+  projectId           String    @map("project_id")
+  title               String
+  description         String?
+  assignedTo          String?   @map("assigned_to")
+  dueDate             DateTime? @map("due_date")
+  status              String    @default("todo")
+  lastActionBy        String?   @map("last_action_by")
+  firstClientActionAt DateTime? @map("first_client_action_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+  @@schema("portalflow")
+}
+
+model Contract {
+  id           String    @id @default(uuid())
+  projectId    String    @map("project_id")
+  template     String
+  status       String    @default("draft")
+  clientEmail  String    @map("client_email")
+  documensoId  String?   @map("documenso_id")
+  fileUrl      String?   @map("file_url")
+  signingUrl   String?   @map("signing_url")
+  sentAt       DateTime? @map("sent_at")
+  signedAt     DateTime? @map("signed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("contracts")
   @@schema("portalflow")
 }
 
@@ -121,13 +162,14 @@ model Message {
 }
 
 model Payment {
-  id        String    @id @default(uuid())
-  projectId String    @map("project_id")
-  amount    Decimal   @db.Decimal(10, 2)
-  status    String    @default("pending")
-  dueDate   DateTime? @map("due_date")
-  paidAt    DateTime? @map("paid_at")
-  createdAt DateTime  @default(now()) @map("created_at")
+  id          String    @id @default(uuid())
+  projectId   String    @map("project_id")
+  description String?
+  amount      Decimal   @db.Decimal(10, 2)
+  status      String    @default("pending")
+  dueDate     DateTime? @map("due_date")
+  paidAt      DateTime? @map("paid_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 

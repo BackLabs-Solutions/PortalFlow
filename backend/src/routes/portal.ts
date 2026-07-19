@@ -17,6 +17,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
         checklistItems: { orderBy: { createdAt: 'asc' } },
         messages: { orderBy: { createdAt: 'asc' } },
         payments: { orderBy: { createdAt: 'desc' } },
+        tasks: { orderBy: { createdAt: 'asc' } },
         user: { select: { name: true, logoUrl: true, brandColor: true } },
       },
     });
@@ -35,6 +36,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
       checklistItems: project.checklistItems,
       messages: project.messages,
       payments: project.payments,
+      tasks: project.tasks,
     });
   } catch (err) {
     next(err);
@@ -80,6 +82,35 @@ router.put('/:id/checklist/:itemId', async (req: Request, res: Response, next: N
         project_url: `${backendUrl}/projects/${item.projectId}`,
       }).catch((err) => console.error('Webhook fire error:', err));
     }
+
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Public: client updates a task's status
+router.put('/:id/tasks/:taskId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const projectId = req.params.id as string;
+    const taskId = req.params.taskId as string;
+    const { status } = req.body;
+
+    if (!['todo', 'doing', 'blocked', 'done'].includes(status)) {
+      throw new AppError(400, 'Invalid status');
+    }
+
+    const task = await prisma.task.findFirst({ where: { id: taskId, projectId } });
+    if (!task) throw new AppError(404, 'Task not found');
+
+    const updated = await prisma.task.update({
+      where: { id: taskId },
+      data: {
+        status,
+        lastActionBy: 'client',
+        ...(task.firstClientActionAt === null && { firstClientActionAt: new Date() }),
+      },
+    });
 
     res.json(updated);
   } catch (err) {

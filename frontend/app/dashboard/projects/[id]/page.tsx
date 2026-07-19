@@ -13,6 +13,8 @@ import { ShareLinkCard } from '@/components/dashboard/ShareLinkCard';
 import { FileSection } from '@/components/dashboard/FileSection';
 import { ChecklistSection } from '@/components/dashboard/ChecklistSection';
 import { MessageSection } from '@/components/dashboard/MessageSection';
+import { TaskSection } from '@/components/dashboard/TaskSection';
+import { PaymentSection } from '@/components/dashboard/PaymentSection';
 
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();
@@ -91,9 +93,12 @@ export default function ProjectDetailPage() {
 
       <ShareLinkCard projectId={project.id} />
 
+      <TaskSection projectId={project.id} />
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <FileSection projectId={project.id} />
         <ChecklistSection projectId={project.id} />
+        <PaymentSection projectId={project.id} />
         <div className="lg:col-span-2">
           <MessageSection projectId={project.id} />
         </div>

@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutGrid, Settings, LogOut } from 'lucide-react';
+import { LayoutGrid, BarChart3, Settings, LogOut } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { clearToken } from '@/lib/auth';
 
 const links = [
   { href: '/dashboard', label: 'Projets', icon: LayoutGrid },
+  { href: '/dashboard/insights', label: 'Insights', icon: BarChart3 },
   { href: '/dashboard/settings', label: 'Paramètres', icon: Settings },
 ];
 

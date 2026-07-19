@@ -71,11 +71,68 @@ export interface Message {
 export interface Payment {
   id: string;
   projectId: string;
+  description: string | null;
   amount: string;
   status: 'pending' | 'sent' | 'overdue' | 'paid';
   dueDate: string | null;
   paidAt: string | null;
   createdAt: string;
+}
+
+export type TaskStatus = 'todo' | 'doing' | 'blocked' | 'done';
+
+export interface Task {
+  id: string;
+  projectId: string;
+  title: string;
+  description: string | null;
+  assignedTo: string | null;
+  dueDate: string | null;
+  status: TaskStatus;
+  lastActionBy: string | null;
+  firstClientActionAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskSummary {
+  todo: number;
+  doing: number;
+  blocked: number;
+  done: number;
+}
+
+export type ContractStatus = 'draft' | 'sent' | 'pending' | 'signed' | 'declined';
+
+export interface Contract {
+  id: string;
+  projectId: string;
+  template: string;
+  status: ContractStatus;
+  clientEmail: string;
+  fileUrl: string | null;
+  signingUrl: string | null;
+  sentAt: string | null;
+  signedAt: string | null;
+  createdAt: string;
+}
+
+export interface TaskCompletionReport {
+  project_id: string;
+  project_name: string;
+  completion_rate: number;
+}
+
+export interface ClientResponseTimeReport {
+  project_id: string;
+  project_name: string;
+  avg_response_time_hours: number;
+}
+
+export interface InvoiceStatusReport {
+  paid: number;
+  unpaid: number;
+  overdue: number;
 }
 
 export interface PortalData {
@@ -90,4 +147,5 @@ export interface PortalData {
   checklistItems: ChecklistItem[];
   messages: Message[];
   payments: Payment[];
+  tasks: Task[];
 }
