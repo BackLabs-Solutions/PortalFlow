@@ -1,10 +1,10 @@
 import { getToken, clearToken } from './auth';
-import type { User, Project, ProjectFile, ChecklistItem, Message, PortalData } from './types';
+import type { User, Project, ProjectFile, ChecklistItem, Message, PortalData, SubscriptionInfo, LimitsInfo } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://portalflow.onrender.com';
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public upgradeUrl?: string) {
     super(message);
     this.name = 'ApiError';
   }
@@ -30,7 +30,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.error || `Request failed (${res.status})`);
+    throw new ApiError(res.status, body.error || `Request failed (${res.status})`, body.upgrade_url);
   }
 
   if (res.status === 204) return undefined as T;
@@ -62,6 +62,23 @@ export const api = {
 
   getReferral: () =>
     request<{ referralCode: string; referralCount: number }>('/users/referral'),
+
+  getLimits: () => request<LimitsInfo>('/users/limits'),
+
+  createCheckoutSession: (tier: 'pro' | 'agency') =>
+    request<{ checkout_url: string }>('/billing/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ tier }),
+    }),
+
+  confirmCheckout: (sessionId: string) =>
+    request<{ message: string; tier: string }>(`/billing/checkout-success?session_id=${sessionId}`),
+
+  getSubscription: () => request<SubscriptionInfo>('/billing/subscription'),
+
+  cancelSubscription: () => request<{ message: string }>('/billing/cancel', { method: 'POST' }),
+
+  getBillingPortalUrl: () => request<{ portal_url: string }>('/billing/portal'),
 
   getProjects: (status?: string) =>
     request<Project[]>(`/projects${status ? `?status=${status}` : ''}`),

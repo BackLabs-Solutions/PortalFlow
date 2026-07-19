@@ -23,10 +23,30 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  projects Project[]
-  webhooks Webhook[]
+  projects     Project[]
+  webhooks     Webhook[]
+  subscription Subscription?
 
   @@map("users")
+  @@schema("portalflow")
+}
+
+model Subscription {
+  id                    String    @id @default(uuid())
+  userId                String    @unique @map("user_id")
+  stripeCustomerId      String?   @map("stripe_customer_id")
+  stripeSubscriptionId  String?   @unique @map("stripe_subscription_id")
+  tier                  String    @default("free")
+  status                String    @default("inactive")
+  currentPeriodStart    DateTime? @map("current_period_start")
+  currentPeriodEnd      DateTime? @map("current_period_end")
+  cancelAt              DateTime? @map("cancel_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
   @@schema("portalflow")
 }
 

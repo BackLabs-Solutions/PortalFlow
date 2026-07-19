@@ -14,6 +14,8 @@ import messageRoutes from './routes/messages';
 import webhookRoutes from './routes/webhooks';
 import zapierRoutes from './routes/zapier';
 import portalRoutes from './routes/portal';
+import billingRoutes from './routes/billing';
+import stripeWebhookRoutes from './routes/stripeWebhook';
 import openapiSpec from './openapi.json';
 
 const app = express();
@@ -32,6 +34,10 @@ app.use(cors({
   origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
   credentials: true,
 }));
+
+// Stripe webhook needs the raw body for signature verification — must be
+// registered before the global JSON body parser below.
+app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookRoutes);
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -64,6 +70,7 @@ app.use('/', messageRoutes);
 app.use('/webhooks', webhookRoutes);
 app.use('/api/zapier', zapierRoutes);
 app.use('/portal', portalRoutes);
+app.use('/billing', billingRoutes);
 
 app.use(errorHandler);
 

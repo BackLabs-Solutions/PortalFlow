@@ -39,10 +39,18 @@ router.post('/verifyToken', async (req: Request, res: Response, next: NextFuncti
 
 router.get('/me', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.id },
+      include: { subscription: true },
+    });
     if (!user) throw new AppError(404, 'User not found');
-    const { apiKey, ...profile } = user;
-    res.json(profile);
+    const { apiKey, subscription, ...profile } = user;
+    res.json({
+      ...profile,
+      subscription: subscription
+        ? { status: subscription.status, currentPeriodEnd: subscription.currentPeriodEnd }
+        : null,
+    });
   } catch (err) {
     next(err);
   }

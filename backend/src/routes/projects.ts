@@ -1,12 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { requireAuth } from '../middleware/auth';
+import { enforceProjectLimit } from '../middleware/limits';
 import prisma from '../config/database';
 import { AppError } from '../utils/errors';
 import { fireWebhook } from '../services/webhook.service';
 
 const router = Router();
 
-router.post('/', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/', requireAuth, enforceProjectLimit, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, description, clientEmail, clientName } = req.body;
     if (!name) throw new AppError(400, 'Project name is required');

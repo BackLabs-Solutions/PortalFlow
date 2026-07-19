@@ -46,6 +46,18 @@ export function NewProjectModal({ open, onClose }: { open: boolean; onClose: () 
       router.push(`/dashboard/projects/${project.id}`);
     },
     onError: (err) => {
+      if (err instanceof ApiError && err.status === 402) {
+        toast.error(err.message, {
+          action: {
+            label: 'Voir les plans',
+            onClick: () => {
+              onClose();
+              router.push('/dashboard/settings');
+            },
+          },
+        });
+        return;
+      }
       toast.error(err instanceof ApiError ? err.message : 'Impossible de créer le projet');
     },
   });

@@ -8,6 +8,21 @@ export interface User {
   tier: string;
 }
 
+export interface SubscriptionInfo {
+  tier: string;
+  status: string;
+  currentPeriodEnd: string | null;
+  cancelAt: string | null;
+}
+
+export interface LimitsInfo {
+  tier: string;
+  maxProjects: number | null;
+  currentProjects: number;
+  canCreateMore: boolean;
+  message: string | null;
+}
+
 export interface Project {
   id: string;
   name: string;

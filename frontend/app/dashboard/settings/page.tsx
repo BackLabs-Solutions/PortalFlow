@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Key, Copy, Check, RefreshCw } from 'lucide-react';
@@ -9,6 +10,35 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
+import { BillingSection } from '@/components/dashboard/BillingSection';
+
+function CheckoutRedirectHandler() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const checkout = params.get('checkout');
+    const sessionId = params.get('session_id');
+
+    if (checkout === 'success' && sessionId) {
+      api
+        .confirmCheckout(sessionId)
+        .then((res) => {
+          toast.success(res.message);
+          queryClient.invalidateQueries({ queryKey: ['profile'] });
+          queryClient.invalidateQueries({ queryKey: ['subscription'] });
+        })
+        .catch(() => toast.error('Paiement reçu, synchronisation en cours…'))
+        .finally(() => router.replace('/dashboard/settings'));
+    } else if (checkout === 'cancelled') {
+      toast.info('Paiement annulé');
+      router.replace('/dashboard/settings');
+    }
+  }, [params, router, queryClient]);
+
+  return null;
+}
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
@@ -35,7 +65,15 @@ export default function SettingsPage() {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       toast.success('Profil mis à jour');
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : 'Échec de la sauvegarde'),
+    onError: (err) => {
+      if (err instanceof ApiError && err.status === 402) {
+        toast.error(err.message, {
+          action: { label: 'Passer Pro', onClick: () => (window.location.href = '/dashboard/settings') },
+        });
+        return;
+      }
+      toast.error(err instanceof ApiError ? err.message : 'Échec de la sauvegarde');
+    },
   });
 
   const generateKey = useMutation({
@@ -55,8 +93,14 @@ export default function SettingsPage() {
 
   if (isLoading) return <Spinner />;
 
+  const isFree = (profile?.tier || 'free') === 'free';
+
   return (
     <div className="max-w-2xl space-y-8">
+      <Suspense fallback={null}>
+        <CheckoutRedirectHandler />
+      </Suspense>
+
       <div>
         <h1 className="font-display text-2xl font-semibold text-ink">Paramètres</h1>
         <p className="mt-1 text-sm text-slate">Profil, marque et intégrations.</p>
@@ -67,7 +111,7 @@ export default function SettingsPage() {
         <Input label="Adresse email" value={profile?.email || ''} disabled />
         <Input label="Nom" value={name} onChange={(e) => setName(e.target.value)} placeholder="Votre nom" />
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-indigo/10 px-2.5 py-1 font-mono text-xs font-medium text-indigo">
+          <span className="rounded-full bg-indigo/10 px-2.5 py-1 font-mono text-xs font-medium capitalize text-indigo">
             Plan {profile?.tier}
           </span>
         </div>
@@ -77,6 +121,8 @@ export default function SettingsPage() {
           </Button>
         </div>
       </Card>
+
+      <BillingSection currentTier={profile?.tier || 'free'} />
 
       <Card className="space-y-4 p-5">
         <h2 className="font-display text-sm font-semibold text-ink">Marque</h2>
@@ -89,15 +135,18 @@ export default function SettingsPage() {
             type="color"
             value={brandColor}
             onChange={(e) => setBrandColor(e.target.value)}
-            className="h-9 w-14 cursor-pointer rounded-control border border-line bg-surface"
+            disabled={isFree}
+            className="h-9 w-14 cursor-pointer rounded-control border border-line bg-surface disabled:cursor-not-allowed disabled:opacity-50"
           />
           <span className="font-mono text-xs text-slate">{brandColor}</span>
         </div>
         <p className="text-xs text-slate">
-          Cette couleur personnalise le portail que voient vos clients (plan Pro et Agence).
+          {isFree
+            ? 'Passez au plan Pro pour personnaliser cette couleur.'
+            : 'Cette couleur personnalise le portail que voient vos clients.'}
         </p>
         <div>
-          <Button loading={saveProfile.isPending} onClick={() => saveProfile.mutate()}>
+          <Button loading={saveProfile.isPending} onClick={() => saveProfile.mutate()} disabled={isFree}>
             Enregistrer
           </Button>
         </div>
