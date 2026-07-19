@@ -19,6 +19,10 @@ import openapiSpec from './openapi.json';
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 
+// Render sits behind a single reverse proxy; trust its X-Forwarded-For
+// header so express-rate-limit can correctly identify client IPs.
+app.set('trust proxy', 1);
+
 const allowedOrigins = (process.env.FRONTEND_URL || '')
   .split(',')
   .map((o) => o.trim())
